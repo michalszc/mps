@@ -6,7 +6,7 @@ on:
             - master
 
 jobs:
-    convert_latest_notebook:
+    convert_notebook:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -15,21 +15,9 @@ jobs:
                 sudo apt-get install inkscape pandoc texlive-xetex
                 pip3 install nbconvert ipykernel
                 pip3 install -r requirements.txt
-            - name: Find latest modified notebook
-              id: find_notebook
-              run: |
-                latest_ipynb=$(git diff --name-only HEAD~1 HEAD | grep '\.ipynb$' | head -n 1)
-                if [ -n "$latest_ipynb" ]; then
-                  pdf_path="${latest_ipynb%.ipynb}.pdf"
-                  echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
-                  echo "pdf_path=$pdf_path" >> $GITHUB_ENV
-                fi
-            - name: Convert Notebook to PDF
-              if: env.notebook_path != ''
-              run: python3 -m nbconvert --to pdf --execute "$notebook_path"
-            - name: Upload PDF artifact
-              if: env.pdf_path != ''
-              uses: actions/upload-artifact@v4
+            - name: Run Jupyter Notebook
+              run: python3 -m nbconvert --to pdf --execute lab01/pint_and_boiling_point.ipynb
+            - uses: actions/upload-artifact@v4
               with:
-                  name: notebook_pdf
-                  path: ${{ env.pdf_path }}
+                  name: lab01
+                  path: lab01/pint_and_boiling_point.pdf
