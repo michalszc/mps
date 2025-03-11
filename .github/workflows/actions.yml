@@ -17,4 +17,8 @@ jobs:
                 pip3 install -r requirements.txt
             - name: Run Jupyter Notebook
               run: python3 -m nbconvert --to pdf --execute lab01/pint_and_boiling_point.ipynb
-            - run: echo "Done!"
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: lab01
+                  path: lab01/pint_and_boiling_point.pdf
+
