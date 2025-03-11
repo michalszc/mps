@@ -11,7 +11,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Install dependencies
-              run: pip3 install nbconvert
+              run: pip3 install nbconvert ipykernel
             - name: Run Jupyter Notebook
               run: python3 -m nbconvert --to pdf --execute lab01/pint_and_boiling_point.ipynb
             - run: echo "Done!"
