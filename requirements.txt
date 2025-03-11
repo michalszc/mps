@@ -1,2 +1,5 @@
 pint
 scipy
+numpy
+open_atmos_jupyter_utils
+matplotlib
