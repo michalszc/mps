@@ -19,14 +19,17 @@ jobs:
               id: find_notebook
               run: |
                 latest_ipynb=$(git diff --name-only HEAD~1 HEAD | grep '\.ipynb$' | head -n 1)
-                echo "Latest modified notebook: $latest_ipynb"
-                echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
+                if [ -n "$latest_ipynb" ]; then
+                  pdf_path="${latest_ipynb%.ipynb}.pdf"
+                  echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
+                  echo "pdf_path=$pdf_path" >> $GITHUB_ENV
+                fi
             - name: Convert Notebook to PDF
               if: env.notebook_path != ''
               run: python3 -m nbconvert --to pdf --execute "$notebook_path"
             - name: Upload PDF artifact
-              if: env.notebook_path != ''
+              if: env.pdf_path != ''
               uses: actions/upload-artifact@v4
               with:
                   name: notebook_pdf
-                  path: ${{ env.notebook_path/.ipynb/.pdf }}
+                  path: ${{ env.pdf_path }}
