@@ -6,18 +6,48 @@ on:
             - master
 
 jobs:
-    convert_notebook:
+    convert_latest_notebook:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+
             - name: Install dependencies
               run: |
                 sudo apt-get install inkscape pandoc texlive-xetex
                 pip3 install nbconvert ipykernel
                 pip3 install -r requirements.txt
-            - name: Run Jupyter Notebook
-              run: python3 -m nbconvert --to pdf --execute lab01/pint_and_boiling_point.ipynb
-            - uses: actions/upload-artifact@v4
+
+            - name: Find latest lab and notebook
+              id: find_notebook
+              run: |
+                latest_lab=$(ls -d lab*/ 2>/dev/null | grep -Eo 'lab[0-9]+' | sort -V | tail -n 1)
+
+                if [ -z "$latest_lab" ]; then
+                  echo "No lab directories found."
+                  exit 1
+                fi
+
+                echo "Latest lab folder: $latest_lab"
+
+                latest_ipynb=$(ls -t "$latest_lab"/*.ipynb 2>/dev/null | head -n 1)
+
+                if [ -z "$latest_ipynb" ]; then
+                  echo "No .ipynb files found in $latest_lab"
+                  exit 1
+                fi
+
+                pdf_path="${latest_ipynb%.ipynb}.pdf"
+
+                echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
+                echo "pdf_path=$pdf_path" >> $GITHUB_ENV
+
+            - name: Convert Notebook to PDF
+              if: env.notebook_path != ''
+              run: python3 -m nbconvert --to pdf --execute "$notebook_path"
+
+            - name: Upload PDF artifact
+              if: env.pdf_path != ''
+              uses: actions/upload-artifact@v4
               with:
-                  name: lab01
-                  path: lab01/pint_and_boiling_point.pdf
+                  name: notebook_pdf
+                  path: ${{ env.pdf_path }}
