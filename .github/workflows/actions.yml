@@ -28,6 +28,7 @@ jobs:
                 fi
 
                 echo "Latest lab folder: $latest_lab"
+                echo "latest_lab=$latest_lab" >> $GITHUB_ENV
 
                 latest_ipynb=$(ls -t "$latest_lab"/*.ipynb 2>/dev/null | head -n 1)
 
@@ -49,5 +50,5 @@ jobs:
               if: env.pdf_path != ''
               uses: actions/upload-artifact@v4
               with:
-                  name: notebook_pdf
+                  name: ${{ env.latest_lab }}
                   path: ${{ env.pdf_path }}
