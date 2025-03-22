@@ -1,0 +1,3 @@
+inkscape
+pandoc
+texlive-xetex

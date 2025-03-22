@@ -10,37 +10,48 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
 
-            - name: Install dependencies
-              run: |
-                sudo apt-get install inkscape pandoc texlive-xetex
-                pip3 install nbconvert ipykernel
-                pip3 install -r requirements.txt
+            - name: Cache apt packages
+              id: cache-apt
+              uses: actions/cache@v4
+              with:
+                path: /var/cache/apt/archives
+                key: apt-${{ runner.os }}-${{ hashFiles('apt-packages.txt') }}
+                restore-keys: apt-${{ runner.os }}-
 
-            - name: Find latest lab and notebook
+            - name: Cache pip dependencies
+              id: cache-pip
+              uses: actions/cache@v4
+              with:
+                path: ~/.cache/pip
+                key: pip-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+                restore-keys: pip-${{ runner.os }}-
+
+            - name: Install apt dependencies
+              if: steps.cache-apt.outputs.cache-hit != 'true'
+              run: xargs sudo apt install -y < apt-packages.txt
+
+            - name: Install pip dependencies
+              if: steps.cache-pip.outputs.cache-hit != 'true'
+              run: pip3 install -r requirements.txt
+
+            - name: Find latest modified notebook
               id: find_notebook
               run: |
-                latest_lab=$(ls -d lab*/ 2>/dev/null | grep -Eo 'lab[0-9]+' | sort -V | tail -n 1)
+                latest_ipynb=$(git diff --name-only HEAD~1 HEAD | grep '\.ipynb$' | head -n 1)
+                if [ -n "$latest_ipynb" ]; then
+                  echo "Latest modified notebook: $latest_ipynb"
+                  echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
 
-                if [ -z "$latest_lab" ]; then
-                  echo "No lab directories found."
-                  exit 1
+                  pdf_path="${latest_ipynb%.ipynb}.pdf"
+                  echo "pdf_path=$pdf_path" >> $GITHUB_ENV
+
+                  latest_lab=$(basename $(dirname $latest_ipynb))
+                  echo "Latest lab folder: $latest_lab"
+                  echo "latest_lab=$latest_lab" >> $GITHUB_ENV
                 fi
-
-                echo "Latest lab folder: $latest_lab"
-                echo "latest_lab=$latest_lab" >> $GITHUB_ENV
-
-                latest_ipynb=$(ls -t "$latest_lab"/*.ipynb 2>/dev/null | head -n 1)
-
-                if [ -z "$latest_ipynb" ]; then
-                  echo "No .ipynb files found in $latest_lab"
-                  exit 1
-                fi
-
-                pdf_path="${latest_ipynb%.ipynb}.pdf"
-
-                echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
-                echo "pdf_path=$pdf_path" >> $GITHUB_ENV
 
             - name: Convert Notebook to PDF
               if: env.notebook_path != ''
