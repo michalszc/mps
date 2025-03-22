@@ -17,7 +17,9 @@ jobs:
               with:
                 packages: inkscape pandoc texlive-xetex
                 version: 1.0
-                execute_install_scripts: true
+
+            - name: Install apt dependencies
+              run: sudo apt install -y inkscape pandoc texlive-xetex
 
             - name: Cache pip dependencies
               uses: actions/setup-python@v5
