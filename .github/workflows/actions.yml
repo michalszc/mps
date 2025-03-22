@@ -14,7 +14,7 @@ jobs:
                   fetch-depth: 2
 
             - name: Install apt dependencies
-              run: sudo apt install -y inkscape pandoc texlive-xetex
+              run: xargs sudo apt install -y < apt-packages.txt
 
             - name: Cache pip dependencies
               uses: actions/setup-python@v5
@@ -28,7 +28,7 @@ jobs:
             - name: Find latest modified notebook
               id: find_notebook
               run: |
-                latest_ipynb="lab02/assignment.ipynb"
+                latest_ipynb=$(git diff --name-only HEAD~1 HEAD | grep '\.ipynb$' | head -n 1)
                 if [ -n "$latest_ipynb" ]; then
                   echo "Latest modified notebook: $latest_ipynb"
                   echo "notebook_path=$latest_ipynb" >> $GITHUB_ENV
