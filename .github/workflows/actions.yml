@@ -13,13 +13,11 @@ jobs:
               with:
                   fetch-depth: 2
 
-            - name: Cache apt packages
-              id: cache-apt
-              uses: actions/cache@v4
+            - uses: awalsh128/cache-apt-pkgs-action@latest
               with:
-                path: /var/cache/apt/archives/*.deb
-                key: apt-${{ runner.os }}-${{ hashFiles('apt-packages.txt') }}
-                restore-keys: apt-${{ runner.os }}-
+                packages: inkscape pandoc texlive-xetex
+                version: 1.0
+                execute_install_scripts: true
 
             - name: Cache pip dependencies
               id: cache-pip
