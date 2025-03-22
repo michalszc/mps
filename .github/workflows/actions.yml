@@ -13,6 +13,9 @@ jobs:
               with:
                   fetch-depth: 2
 
+            - name: Install apt dependencies
+              run: sudo apt install -y inkscape pandoc texlive-xetex
+
             - name: Cache pip dependencies
               uses: actions/setup-python@v5
               with:
@@ -21,15 +24,6 @@ jobs:
 
             - name: Install pip dependencies
               run: pip3 install -r requirements.txt
-                
-            - uses: awalsh128/cache-apt-pkgs-action@latest
-              with:
-                packages: pandoc texlive-xetex
-                version: 1.0
-                execute_install_scripts: true
-
-            - name: Install apt dependencies
-              run: sudo apt install -y inkscape
 
             - name: Find latest modified notebook
               id: find_notebook
