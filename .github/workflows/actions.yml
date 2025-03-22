@@ -27,10 +27,6 @@ jobs:
                 key: pip-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
                 restore-keys: pip-${{ runner.os }}-
 
-            - name: Install apt dependencies
-              if: steps.cache-apt.outputs.cache-hit != 'true'
-              run: xargs sudo apt install -y < apt-packages.txt
-
             - name: Install pip dependencies
               if: steps.cache-pip.outputs.cache-hit != 'true'
               run: pip3 install -r requirements.txt
