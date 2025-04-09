@@ -41,14 +41,15 @@ jobs:
                   echo "latest_lab=$latest_lab" >> $GITHUB_ENV
                 fi
 
-            - name: Run nbqa pylint
-              if: env.notebook_path != ''
+            - name: Run nbQA
               run: |
-                echo "## 🧹 Pylint Report for \`$notebook_path\`" > $GITHUB_STEP_SUMMARY
+                echo "## 🧹 nbQA report for \`$notebook_path\`" > $GITHUB_STEP_SUMMARY
                 echo "" >> $GITHUB_STEP_SUMMARY
 
                 # Run and capture output
                 nbqa pylint $notebook_path > pylint_output.txt
+
+                cat pylint_output.txt
 
                 # Extract score (e.g. 9.80/10)
                 score_line=$(grep "Your code has been rated at" pylint_output.txt)
