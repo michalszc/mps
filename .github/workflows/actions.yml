@@ -43,10 +43,13 @@ jobs:
 
             - name: Run nbQA
               run: |
+                notebook_path="lab05/advection_mpdata.ipynb"
+
                 echo "## 🧹 nbQA report for \`$notebook_path\`" > $GITHUB_STEP_SUMMARY
                 echo "" >> $GITHUB_STEP_SUMMARY
 
                 # Run and capture output
+                nbqa pylint $notebook_path
                 nbqa pylint $notebook_path > pylint_output.txt
 
                 cat pylint_output.txt
