@@ -42,13 +42,10 @@ jobs:
                 fi
 
             - name: Run nbQA
+              if: env.notebook_path != ''
               run: |
-                notebook_path="lab05/advection_mpdata.ipynb"
-
-                echo "## 🧹 Pylint Report for \`$notebook_path\`" > $GITHUB_STEP_SUMMARY
+                echo "## 🧹 nbQA report for \`$notebook_path\`" > $GITHUB_STEP_SUMMARY
                 echo "" >> $GITHUB_STEP_SUMMARY
-
-                echo "nbqa pylint $notebook_path"
 
                 # Run and capture output
                 pylint_output=$(nbqa pylint $notebook_path || true)
@@ -56,9 +53,6 @@ jobs:
                 # Extract score (e.g. 9.80/10)
                 score_line=$(echo "$pylint_output" | grep "Your code has been rated at")
                 score=$(echo "$score_line" | grep -o '[0-9.]\{1,\}/10' | cut -d '/' -f1)
-
-                echo "Score_line: $score_line"
-                echo "Score: $score"
 
                 # Determine badge color
                 badge_color="red"
@@ -68,12 +62,8 @@ jobs:
                   badge_color="yellow"
                 fi
 
-                echo "Badge color: $badge_color"
-
                 # Encode score for badge (e.g. 9.8/10 -> 9.8%2F10)
                 score_encoded=$(echo "$score/10" | sed 's/\//%2F/')
-
-                echo "Score encoded: $score_encoded"
 
                 # If score < 10.0, show issues
                 if (( $(echo "$score < 10.0" | bc -l) )); then
