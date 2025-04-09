@@ -5,3 +5,5 @@ open_atmos_jupyter_utils
 matplotlib
 ipykernel
 nbconvert
+nbqa
+pylint
