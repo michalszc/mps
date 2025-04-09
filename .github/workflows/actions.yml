@@ -51,7 +51,7 @@ jobs:
                 echo "nbqa pylint $notebook_path"
 
                 # Run and capture output
-                pylint_output=$(nbqa pylint $notebook_path)
+                pylint_output=$(nbqa pylint $notebook_path || true)
 
                 # Extract score (e.g. 9.80/10)
                 score_line=$(echo "$pylint_output" | grep "Your code has been rated at")
