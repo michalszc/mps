@@ -14,7 +14,7 @@ jobs:
                   fetch-depth: 2
 
             - name: Install apt dependencies
-              run: xargs sudo apt install -y < apt-packages.txt
+              run: xargs sudo apt install -y --fix-missing < apt-packages.txt
 
             - name: Cache pip dependencies
               uses: actions/setup-python@v5
