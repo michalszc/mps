@@ -7,3 +7,4 @@ ipykernel
 nbconvert
 nbqa
 pylint
+numba
